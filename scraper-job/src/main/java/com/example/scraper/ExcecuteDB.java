@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
 
-import com.example.scraper.indeed.Indeed;
 import com.example.shell.Company;
 import com.example.shell.Job;
-import com.example.shell.SiteType;
 import com.example.sql.DAO;
 import com.example.sql.PsqlJobs;
 import com.example.sql.PsqlWebsite;
@@ -49,9 +47,9 @@ public class ExcecuteDB {
         // "https://www.talent.com/public/assets/img/icon-talent-t-logo.png",
         // SiteType.TALENT);
 
-        Indeed indeed = new Indeed(3, "https://www.indeed.com", "Indeed",
-                "https://media-exp1.licdn.com/dms/image/C4E0BAQEYTvj7n4hMFw/company-logo_200_200/0/1625170511386?e=1646265600&v=beta&t=qDJZxmQx-Kgg9gVOeZxaPtPQcyCSR30LNlUh6kwVJqA",
-                SiteType.INDEED);
+        // Indeed indeed = new Indeed(3, "https://www.indeed.com", "Indeed",
+        // "https://media-exp1.licdn.com/dms/image/C4E0BAQEYTvj7n4hMFw/company-logo_200_200/0/1625170511386?e=1646265600&v=beta&t=qDJZxmQx-Kgg9gVOeZxaPtPQcyCSR30LNlUh6kwVJqA",
+        // SiteType.INDEED);
 
         // Glassdoor glassdoor = new Glassdoor(4, "https://www.glassdoor.com",
         // "Glassdoor", "", SiteType.GLASSDOOR);
@@ -65,10 +63,10 @@ public class ExcecuteDB {
         // addCompany(simplyhired, null, null);
         // angelco.getJobsData(12, "React");
 
-        Collection<Job> glassdoorJob = indeed.getJobsData(13, "Software Engineer");
+        // Collection<Job> glassdoorJob = indeed.getJobsData(13, "Software Engineer");
 
-        for (Job job : glassdoorJob) {
-            addJob(job, Optional.of(indeed.getId()), null);
-        }
+        // for (Job job : glassdoorJob) {
+        // addJob(job, Optional.of(indeed.getId()), null);
+        // }
     }
 }
