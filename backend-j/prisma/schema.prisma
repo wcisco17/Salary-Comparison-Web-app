@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Website {
+  id    Int     @id @default(autoincrement())
+  url   String
+  title String
+  logo  String
+  type  String?
+  jobs  Job[]
+}
+
+model Job {
+  id           Int     @id @default(autoincrement())
+  title        String
+  salary       String
+  company_name String
+  url          String
+  reference_id String? // This refers to the unique attribute of a job. (URL)
+  job_type     String?
+  logo         String?
+
+  // Optional
+  location          String?
+  short_description String?
+  summary           String?
+  experience        String?
+  website           Website? @relation(fields: [websiteId], references: [id])
+  websiteId         Int?
+}
