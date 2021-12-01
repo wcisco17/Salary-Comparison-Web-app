@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.example.shell.Company;
 import com.example.shell.Job;
 import com.example.shell.Scraper;
 import com.example.shell.SiteType;
@@ -15,10 +14,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-public class SimplyHired extends Company implements Scraper<Job> {
-    public SimplyHired(Integer id, String url, String title, String logo, SiteType type) {
-        super(id, url, title, logo, type);
-    }
+public class SimplyHired implements Scraper<Job> {
+    public SiteType title = SiteType.SIMPLYHIRED;
+    private static String websiteUrl = "https://www.simplyhired.com";
 
     @Override
     public Collection<Job> getJobsData(int jobLimit, String search) throws IOException {
@@ -28,7 +26,7 @@ public class SimplyHired extends Company implements Scraper<Job> {
         Collection<Job> companies = new ArrayList<Job>();
 
         try {
-            driver.get(this.getUrl());
+            driver.get(websiteUrl);
 
             driver.findElement(By.cssSelector("#SearchForm-whatInput")).sendKeys(search + Keys.ENTER);
 
@@ -56,7 +54,7 @@ public class SimplyHired extends Company implements Scraper<Job> {
             String jobTitle = doc.select("a.SerpJob-link.card-link").get(i).text();
             String location = doc.select("span.jobposting-location").get(i).text();
 
-            String url = "https://www.simplyhired.com" + doc.select("a[href*=/job/]").get(i).attr("href");
+            String url = websiteUrl + doc.select("a[href*=/job/]").get(i).attr("href");
 
             String shortDescription = doc.select("div.SerpJob-snippetContainer > p.jobposting-snippet").get(i).text();
             Job job = new Job(companyName, jobTitle, salary, logo, url, location, shortDescription, jobType);

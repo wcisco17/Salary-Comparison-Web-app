@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.example.shell.Company;
 import com.example.shell.Job;
 import com.example.shell.Scraper;
 import com.example.shell.SiteType;
@@ -14,11 +13,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-public class Indeed extends Company implements Scraper<Job> {
-
-    public Indeed(Integer id, String url, String title, String logo, SiteType type) {
-        super(id, url, title, logo, type);
-    }
+public class Indeed implements Scraper<Job> {
+    public SiteType title = SiteType.INDEED;
+    private static String websiteUrl = "https://www.indeed.com";
 
     public Collection<Job> getJobsData(int jobLimit, String search) throws IOException {
         System.setProperty("webdriver.chrome.driver",
@@ -27,9 +24,9 @@ public class Indeed extends Company implements Scraper<Job> {
         Collection<Job> companies = new ArrayList<Job>();
 
         try {
-            driver.get(this.getUrl());
+            driver.get(websiteUrl);
 
-            driver.get(this.getUrl() + "/q-" + search.replace(" ", "+") + "-" + "$100,000-jobs.html");
+            driver.get(websiteUrl + "/q-" + search.replace(" ", "+") + "-" + "$100,000-jobs.html");
 
             String pageSource = driver.getPageSource();
 
@@ -64,7 +61,7 @@ public class Indeed extends Company implements Scraper<Job> {
             // class="tapItem fs-unmask
 
             String url = "";
-            url = "https://www.indeed.com" + doc.select("a[class*=tapItem]").get(s).attr("href");
+            url = websiteUrl + doc.select("a[class*=tapItem]").get(s).attr("href");
 
             Job job = new Job(companyName, jobTitle, salary, logo, url, location, shortDescription, jobType);
             indeedJobs.add(job);

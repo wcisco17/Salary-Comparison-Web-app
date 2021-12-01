@@ -1,16 +1,27 @@
 package com.example.scraper;
 
 import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Scanner;
 
+import com.example.scraper.glassdoor.Glassdoor;
+import com.example.scraper.indeed.Indeed;
+import com.example.scraper.remoteok.Remoteok;
+import com.example.scraper.simplyhired.SimplyHired;
+import com.example.scraper.talent.Talent;
 import com.example.shell.Company;
 import com.example.shell.Job;
+import com.example.shell.Scraper;
 import com.example.sql.DAO;
 import com.example.sql.PsqlJobs;
 import com.example.sql.PsqlWebsite;
 
 public class ExcecuteDB {
+    private static final PrintStream OUT = System.out;
+    private static Collection<Job> jobs = new ArrayList<Job>();
     private static final DAO<Company, String> COMPANY_DAO = new PsqlWebsite();
     private static final DAO<Job, String> JOB_DAO = new PsqlJobs();
 
@@ -38,35 +49,80 @@ public class ExcecuteDB {
         return null;
     }
 
+    private static void runGetJobsData(String searchQuery, int searchQueryLimit, Scraper<Job> talent, Company comp) {
+        try {
+            jobs = talent.getJobsData((searchQueryLimit), searchQuery);
+            for (Job job : jobs) {
+                addJob(job, Optional.of(comp.getId()), null);
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error " + e);
+            e.printStackTrace();
+        }
+    }
+
     public static void main() throws IOException {
-        // Remoteok remoteOk = new Remoteok(1, "https://remoteok.io/", "RemoteOk",
-        // "https://remoteok.com/cdn-cgi/image/format=auto,fit=contain,width=100,height=100,quality=85/https://remoteok.com/assets/logo-square.png?1633381266",
-        // SiteType.REMOTEOK);
+        // prompts variables
+        Scanner in = new Scanner(System.in);
+        int companyId;
+        String searchQuery;
+        int searchQueryLimit;
 
-        // Talent talent = new Talent(2, "https://www.talent.com", "Talent",
-        // "https://www.talent.com/public/assets/img/icon-talent-t-logo.png",
-        // SiteType.TALENT);
+        Collection<Company> companies = getAllCompanies();
 
-        // Indeed indeed = new Indeed(3, "https://www.indeed.com", "Indeed",
-        // "https://media-exp1.licdn.com/dms/image/C4E0BAQEYTvj7n4hMFw/company-logo_200_200/0/1625170511386?e=1646265600&v=beta&t=qDJZxmQx-Kgg9gVOeZxaPtPQcyCSR30LNlUh6kwVJqA",
-        // SiteType.INDEED);
+        // classes to run
+        Talent talent = new Talent();
+        Remoteok remoteok = new Remoteok();
+        SimplyHired simplyhired = new SimplyHired();
+        Indeed indeed = new Indeed();
+        Glassdoor glassdoor = new Glassdoor();
 
-        // Glassdoor glassdoor = new Glassdoor(4, "https://www.glassdoor.com",
-        // "Glassdoor", "", SiteType.GLASSDOOR);
-        // glassdoor.getJobsData(12, "React");
+        OUT.println("What type of jobs are you looking to pull from, Exp: Engineer, Product Manager,");
+        searchQuery = in.nextLine();
 
-        // SimplyHired simplyhired = new SimplyHired(5, "https://www.simplyhired.com",
-        // "SimplyHired",
-        // "https://d3iouj7udfksni.cloudfront.net/static/base/img/sh-logo-wordmark.png",
-        // SiteType.SIMPLYHIRED);
+        OUT.printf("\n Perfect we'll look for: %s! \n - Please choose between the following companies to pull from \n",
+                searchQuery);
+        OUT.printf("Type the following keys: from (1 - %s) \n", companies.size());
 
-        // addCompany(simplyhired, null, null);
-        // angelco.getJobsData(12, "React");
+        // list out all the companies.
+        companies.forEach(i -> {
+            OUT.printf("(id %s), Company Name: %s \n", i.getId(), i.getTitle());
+        });
 
-        // Collection<Job> glassdoorJob = indeed.getJobsData(13, "Software Engineer");
+        companyId = in.nextInt();
+        companies.forEach(comp -> {
+            if (companyId == comp.getId())
+                OUT.printf("You've chosen company: %s looking for job: %s \n", comp.getTitle(), searchQuery);
+        });
 
-        // for (Job job : glassdoorJob) {
-        // addJob(job, Optional.of(indeed.getId()), null);
-        // }
+        OUT.printf("How many jobs would you like to pull?\n");
+        searchQueryLimit = in.nextInt();
+
+        OUT.printf("Looking for %s jobs \n", searchQueryLimit);
+
+        companies.forEach(comp -> {
+            if (companyId == comp.getId() && comp.getSiteType() == talent.title) {
+                runGetJobsData(searchQuery, searchQueryLimit, talent, comp);
+            }
+
+            else if (companyId == comp.getId() && comp.getSiteType() == remoteok.title) {
+                runGetJobsData(searchQuery, searchQueryLimit, remoteok, comp);
+            }
+
+            else if (companyId == comp.getId() && comp.getSiteType() == simplyhired.title) {
+                runGetJobsData(searchQuery, searchQueryLimit, simplyhired, comp);
+            }
+
+            else if (companyId == comp.getId() && comp.getSiteType() == indeed.title) {
+                runGetJobsData(searchQuery, searchQueryLimit, indeed, comp);
+            }
+
+            else if (companyId == comp.getId() && comp.getSiteType() == glassdoor.title) {
+                runGetJobsData(searchQuery, searchQueryLimit, glassdoor, comp);
+            }
+        });
+
+        in.close();
     }
 }

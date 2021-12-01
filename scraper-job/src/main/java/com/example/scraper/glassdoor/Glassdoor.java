@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.example.shell.Company;
 import com.example.shell.Job;
 import com.example.shell.Scraper;
 import com.example.shell.SiteType;
@@ -17,10 +16,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-public class Glassdoor extends Company implements Scraper<Job> {
-    public Glassdoor(Integer id, String url, String title, String logo, SiteType type) {
-        super(id, url, title, logo, type);
-    }
+public class Glassdoor implements Scraper<Job> {
+    public SiteType title = SiteType.GLASSDOOR;
+    private static String websiteUrl = "https://www.indeed.com";
 
     @Override
     public Collection<Job> getJobsData(int jobLimit, String search) throws IOException {
@@ -33,13 +31,13 @@ public class Glassdoor extends Company implements Scraper<Job> {
         Collection<Job> companies = new ArrayList<Job>();
 
         try {
-            driver.get(this.getUrl());
+            driver.get(websiteUrl);
             driver.findElement(By.cssSelector(".d-none.d-lg-block.p-0.LockedHomeHeaderStyles__signInButton")).click();
             driver.findElement(By.cssSelector("#userEmail")).sendKeys(fakeUsername + Keys.ENTER);
             driver.findElement(By.cssSelector("#userPassword")).sendKeys(fakePassword + Keys.ENTER);
-            driver.get(this.getUrl());
+            driver.get(websiteUrl);
 
-            driver.get(this.getUrl() + "/Job/jobs.htm?sc.keyword=" + search + "&minSalary=64000&maxSalary=159000");
+            driver.get(websiteUrl + "/Job/jobs.htm?sc.keyword=" + search + "&minSalary=64000&maxSalary=159000");
 
             String pageSource = driver.getPageSource();
             companies = mapJobsData(jobLimit, pageSource, search);

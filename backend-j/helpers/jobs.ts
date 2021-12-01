@@ -25,14 +25,14 @@ export function extractDuplicate(jobTypes: IShowResultJobTypes): IShowResultJobT
   return result;
 }
 
-export const isByKeywords = (by: 'title' | 'company_name', keyword: string): object => {
+export const isByKeywords = (by: 'title' | 'company_name' | unknown, keyword: string): object => {
   if (by === "title") {
     return {
-      title: { startsWith: keyword }
+      title: { startsWith: keyword, mode: 'insensitive' }
     }
   } else if (by === "company_name") {
     return {
-      company_name: { startsWith: keyword }
+      company_name: { startsWith: keyword, mode: 'insensitive' }
     }
   }
 }
@@ -61,3 +61,17 @@ export const isByResult = (result: Pick<ISearchType, 'byResult'>): {} => {
       return {}
   }
 }
+
+export function cleanupSalaries(salary: string) {
+  return salary.replace('*', '').replace('💰', '').replace('k', '').replace('(Glassdoor est.)', '').replace(' ', '').replace('a year', '').replace('(Employer est.)', '')
+}
+
+// const getJobTypes = async () => {
+//   const items = await search({ db: prisma, keywordType: 'title', keyword: "Sof", byResult: 'all', take: 0 });
+//   // list out the values
+
+//   // seperate function here that returns the min and max of the search values
+//   queryMinMax((items as Job[]));
+// }
+
+// getJobTypes();

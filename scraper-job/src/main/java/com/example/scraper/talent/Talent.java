@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.example.shell.Company;
 import com.example.shell.Job;
 import com.example.shell.Scraper;
 import com.example.shell.SiteType;
@@ -15,10 +14,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-public class Talent extends Company implements Scraper<Job> {
-    public Talent(Integer id, String url, String title, String logo, SiteType type) {
-        super(id, url, title, logo, type);
-    }
+public class Talent implements Scraper<Job> {
+    public SiteType title = SiteType.TALENT;
+    private static String websiteUrl = "https://www.talent.com";
 
     public Collection<Job> getJobsData(int jobLimit, String search) throws IOException {
         System.setProperty("webdriver.chrome.driver",
@@ -27,7 +25,7 @@ public class Talent extends Company implements Scraper<Job> {
         Collection<Job> companies = new ArrayList<Job>();
 
         try {
-            driver.get(this.getUrl() + "/jobs");
+            driver.get(websiteUrl + "/jobs");
 
             driver.findElement(By.cssSelector("#nv-k")).sendKeys(search + Keys.ENTER);
             String pageSource = driver.getPageSource();
@@ -51,7 +49,7 @@ public class Talent extends Company implements Scraper<Job> {
             String salary = doc.selectXpath("//div[@class='sideCard--stats--mainNumber timeBased']").text();
             String logo = doc.select("img[class='card__job-logo']").get(i).attr("src");
 
-            String url = this.getUrl() + doc.select("div.link-job-wrap").get(i).attr("data-link");
+            String url = websiteUrl + doc.select("div.link-job-wrap").get(i).attr("data-link");
             String shortDescription = doc.selectXpath("//p[@class='card__job-snippet']").get(i).text();
             String jobType = type;
 
