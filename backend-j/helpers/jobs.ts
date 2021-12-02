@@ -1,11 +1,11 @@
-import { ISearchType, IShowResultJobTypes } from "../types/types";
+import { ISearchTypeResult, IShowResultJobTypes } from "../types/types";
 
 /**
  * 
- * @notes Need to improve space and time complexity 
+ * @notes Need to improve space complexity 
  */
-// Time Complexity: O(n + 1) n = length of the array, 1 = look up the keys
-// Space complexity: O(n + 1) = n length of the input array, 1 = hash table.
+// Time Complexity: O(n) n = length of the array, 1 = look up the keys
+// Space complexity: O(n) = n length of the input array, 1 = hash table.
 export function extractDuplicate(jobTypes: IShowResultJobTypes): IShowResultJobTypes {
   const newHash = new Map<string, number>();
 
@@ -28,16 +28,16 @@ export function extractDuplicate(jobTypes: IShowResultJobTypes): IShowResultJobT
 export const isByKeywords = (by: 'title' | 'company_name' | unknown, keyword: string): object => {
   if (by === "title") {
     return {
-      title: { startsWith: keyword, mode: 'insensitive' }
+      title: { contains: keyword, mode: 'insensitive' }
     }
   } else if (by === "company_name") {
     return {
-      company_name: { startsWith: keyword, mode: 'insensitive' }
+      company_name: { contains: keyword, mode: 'insensitive' }
     }
   }
 }
 
-export const isByResult = (result: Pick<ISearchType, 'byResult'>): {} => {
+export const isByResult = (result: Pick<ISearchTypeResult, 'byResult'>): {} => {
   const { byResult } = result;
 
   switch (byResult) {
@@ -63,7 +63,8 @@ export const isByResult = (result: Pick<ISearchType, 'byResult'>): {} => {
 }
 
 export function cleanupSalaries(salary: string) {
-  return salary.replace('*', '').replace('💰', '').replace('k', '').replace('(Glassdoor est.)', '').replace(' ', '').replace('a year', '').replace('(Employer est.)', '')
+  const sal = salary ? salary : ''
+  return sal.replace('*', '').replace('💰', '').replace('k', '').replace('(Glassdoor est.)', '').replace('a year', '').replace('(Employer est.)', '').replace('Per', '').replace('Hour', '').replace(' ', '')
 }
 
 // const getJobTypes = async () => {
