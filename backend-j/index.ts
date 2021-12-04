@@ -1,7 +1,7 @@
-import { Job, PrismaClient } from '@prisma/client';
+import { Job, PrismaClient, Website } from '@prisma/client';
 import express from 'express';
 import { getJob, getJobType, getJobTypes, search } from "./db/jobs";
-import { ISearchTypeResult } from "./types/types";
+import { IJobs, ISearchTypeResult } from "./types/types";
 
 const prisma = new PrismaClient();
 const app = express();
@@ -40,7 +40,16 @@ const api = async () => {
 
   app.get("/job_type/:type", async (req, res) => {
     const type = req.params.type;
-    const items: Job[] = await getJobType({ db: prisma, type, });
+
+    let min = Number(req.query.min);
+    let max = Number(req.query.max);
+
+    if (!min)
+      min = null
+    if (!max)
+      max = null
+
+    const items: IJobs[] = await getJobType({ db: prisma, type, min, max });
 
     if (items.length <= 0)
       res.json({ error: "No Job type found" })
@@ -54,6 +63,19 @@ const api = async () => {
     if (!item)
       res.json({ error: `No Job found with id: ${id}` })
     res.json(item)
+  })
+
+  app.get("/companies", async (_, res) => {
+    const companies: Pick<Website, 'id' | 'title'>[] = await prisma.website.findMany({
+      select: {
+        id: true,
+        title: true,
+      },
+      orderBy: {
+        id: 'asc'
+      }
+    });
+    res.json(companies)
   })
 
   app.get("/", async (_, res) => {

@@ -21,15 +21,16 @@ export async function getJobTypes(db: PrismaClient): Promise<IShowResultJobTypes
   }
 }
 
-export async function getJobType({ db, type }: IGetJobTypeResult): Promise<Job[]> {
+export async function getJobType({ db, type, min, max }: IGetJobTypeResult): Promise<IJobs[]> {
   try {
     const jobType: Job[] = await db.job.findMany({
       where: {
         job_type: type
       }
     })
-
-    return jobType;
+    const filteredJobs: IJobs[] = convertMinMax((jobType as Job[]));
+    const newJobs: IJobs[] = queryMinMax({ filteredJobs, min: (min as number | null), max: (max as number | null) })
+    return newJobs;
   } catch (error) {
     throw new Error("Error while running query " + error)
   }
