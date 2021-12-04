@@ -1,15 +1,15 @@
 import { Job, PrismaClient } from '@prisma/client';
 import express from 'express';
-import { getJob, getJobType, getJobTypes, queryMinMax, search } from "./db/jobs";
+import { getJob, getJobType, getJobTypes, search } from "./db/jobs";
 import { ISearchTypeResult } from "./types/types";
 
 const prisma = new PrismaClient();
 const app = express();
 
 app.use(express.json());
-const PORT = process.env.PORT || 3000;
+const PORT = 8080;
 
-(() => {
+const api = async () => {
   app.get("/job_types", async (req, res) => {
     const jobTypes = await getJobTypes(prisma);
     res.json(jobTypes);
@@ -21,11 +21,19 @@ const PORT = process.env.PORT || 3000;
     const keywordType: Pick<ISearchTypeResult, 'keywordType'> = (req.params.keywordType as unknown as Pick<ISearchTypeResult, 'keywordType'>)
     const keyword: string = req.params.keyword
 
+    let min: unknown = Number(req.query.min);
+    let max: unknown = Number(req.query.max);
+
+    if (!min)
+      min = null
+    if (!max)
+      max = null
+
     // THE SEARCH RESULT ON THE FRONTEND WOULD SHOW: found 120 jobs for keys: (Senior)
-    const items = await search({ db: prisma, keywordType, keyword, byResult, take });
+    const items = await search({ db: prisma, keywordType, keyword, byResult, take, min, max });
 
     if (items.length <= 0)
-      return res.json({ error: `No results for keyword: ${keyword}` })
+      res.json({ error: `No results for keyword: ${keyword}` })
 
     res.json(items);
   })
@@ -45,17 +53,17 @@ const PORT = process.env.PORT || 3000;
 
     if (!item)
       res.json({ error: `No Job found with id: ${id}` })
-    return res.json(item)
+    res.json(item)
   })
 
   app.get("/", async (_, res) => {
     res.json({ hello: "mode!" });
   })
 
-  app.listen(PORT, () => {
-    console.log(`listening at http://localhost:${PORT}`);
-  })
+  let hostname = "0.0.0.0";
+  app.listen(PORT, hostname, () => {
+    console.log(`Listening on port: ${PORT}`);
+  });
+}
 
-  // 4. List min max of jobs - needs to compile all the min and max values to compare. - Needs to work with function above.
-
-})()
+api()

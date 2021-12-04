@@ -8,6 +8,8 @@ export type ISearchTypeResult = {
   byResult: "title" | "company_name" | 'all' | unknown;
   keyword: string;
   take?: number;
+  min?: Pick<IQueryMinMax, 'min'>;
+  max?: Pick<IQueryMinMax, 'max'>;
 };
 
 export type IGetJobTypeResult = {
@@ -18,4 +20,20 @@ export type IGetJobTypeResult = {
 export type IGetJobResult = {
   db: PrismaClient;
   id: number;
+}
+
+export type IJobs = {
+  min: number | undefined;
+  max: number | undefined;
+  job: Job
+}
+
+export type ISearchResult = IJobs[] | Job[] | Array<{
+  title: string;
+}>;
+
+export type IQueryMinMax = {
+  filteredJobs: IJobs[]
+  min?: number | null
+  max?: number | null
 }

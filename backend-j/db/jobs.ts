@@ -1,6 +1,6 @@
 import type { Job, PrismaClient } from "@prisma/client";
-import { cleanupSalaries, extractDuplicate, isByKeywords, isByResult } from "../helpers/jobs";
-import { IGetJobResult, IGetJobTypeResult, ISearchTypeResult, IShowResultJobTypes } from "../types/types";
+import { convertMinMax, extractDuplicate, isByKeywords, isByResult } from "../helpers/jobs";
+import { IGetJobResult, IGetJobTypeResult, IJobs, IQueryMinMax, ISearchResult, ISearchTypeResult, IShowResultJobTypes } from "../types/types";
 
 export async function getJobTypes(db: PrismaClient): Promise<IShowResultJobTypes> {
   try {
@@ -14,6 +14,7 @@ export async function getJobTypes(db: PrismaClient): Promise<IShowResultJobTypes
     });
 
     const jobs = extractDuplicate(jobTypes);
+
     return jobs;
   } catch (err) {
     throw new Error("Error when running query" + err);
@@ -22,13 +23,13 @@ export async function getJobTypes(db: PrismaClient): Promise<IShowResultJobTypes
 
 export async function getJobType({ db, type }: IGetJobTypeResult): Promise<Job[]> {
   try {
-    const jobType = await db.job.findMany({
+    const jobType: Job[] = await db.job.findMany({
       where: {
         job_type: type
       }
     })
-    return jobType;
 
+    return jobType;
   } catch (error) {
     throw new Error("Error while running query " + error)
   }
@@ -36,7 +37,7 @@ export async function getJobType({ db, type }: IGetJobTypeResult): Promise<Job[]
 
 export async function getJob({ db, id }: IGetJobResult): Promise<Job> {
   try {
-    const job = await db.job.findUnique({
+    const job: Job = await db.job.findUnique({
       where: {
         id: Number(id)
       }
@@ -48,16 +49,22 @@ export async function getJob({ db, id }: IGetJobResult): Promise<Job> {
   }
 }
 
-export async function search({ db, keywordType, keyword, byResult, take }: ISearchTypeResult): Promise<Job[] | Array<{ title: string }>> {
+export async function search({ db, keywordType, keyword, byResult, take, min, max }: ISearchTypeResult): Promise<ISearchResult> {
   try {
-    const result = await db.job.findMany({
+    const result: Job[] = await db.job.findMany({
       ...isByResult({ byResult }),
       where: {
         ...isByKeywords(keywordType, keyword),
       },
       take: 20 + take,
     });
-    queryMinMax((result as Job[]));
+
+    if (byResult == 'all') {
+      const filteredJobs: IJobs[] = convertMinMax((result as Job[]));
+      const newJobs: IJobs[] = queryMinMax({ filteredJobs, min: (min as number | null), max: (max as number | null) })
+
+      return newJobs;
+    }
 
     return result
   } catch (error) {
@@ -65,49 +72,28 @@ export async function search({ db, keywordType, keyword, byResult, take }: ISear
   }
 }
 
+export function queryMinMax({ filteredJobs, min, max }: IQueryMinMax): IJobs[] {
+  let result: IJobs[] = [];
 
-type NewValues = {
-  min: number | undefined;
-  max: number | undefined;
-}
-
-type IJobs = Job & NewValues
-
-export function queryMinMax(jobs: Job[]) {
-  let newSalary: string = "";
-  let min = [];
-  let max = [];
-  const filteredJobs: IJobs[] = new Array(jobs.length);
-
-  for (let j = 0; j < jobs.length; j++) {
-    // clean up our salaries
-    newSalary = cleanupSalaries(jobs[j].salary)
-
-    if (newSalary.match('-')) {
-      let sal = newSalary.replace('-', ' -');
-      const splitSal = sal.split(' ');
-
-      for (let i = 0; i < splitSal.length; i++) {
-        // remove empty string
-        if (splitSal[i] == '') {
-          splitSal.splice(i, 1)
-        }
-
-        if (splitSal[i] == '-') {
-          min.push(toNumber(splitSal[i - 1].replace('K', ',000').replace('k', ',000')))
-          max.push(toNumber(splitSal[i + 1].replace('K', ',000').replace('k', ',000')))
-        }
-      }
-    } else {
-      min.push(0)
-      max.push(toNumber(newSalary))
-    }
+  // grab the min and max
+  if (min != null && max != null) {
+    result = filteredJobs.filter((job) => job.min >= min && job.max <= max);
   }
-  for (let i = 0; i < min.length; i++) {
-    // console.log({ i, min: min[i], max: max[i] })
-  }
-}
 
-function toNumber(max: string) {
-  return Number(max.replace('$', '').replace(',', '').replace(' ', ''));
+  // if the max is empty
+  else if (min != null && !max) {
+    result = filteredJobs.filter(job => job.min >= min)
+  }
+
+  // if the min is empty
+  else if (max != null && !min) {
+    result = filteredJobs.filter(job => job.max <= max)
+  }
+
+  // both max and min are null return everthing.
+  else if (!max && !min) {
+    result = filteredJobs
+  }
+
+  return result
 }
