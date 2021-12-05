@@ -8,6 +8,7 @@
     "isolatedModules": true,
     "rootDir": ".",
     "lib": ["dom", "es2017"],
+    "downlevelIteration": true,
     "module": "esnext",
     "baseUrl": ".",
     "moduleResolution": "node",

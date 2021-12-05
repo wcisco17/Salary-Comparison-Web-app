@@ -39,8 +39,8 @@ export default function Index({ data }: InferGetServerSidePropsType<typeof getSe
               return (
                 <Button
                   onClick={() => router.push(
-                    `/type/[type]`,
-                    `/type/${trJobTypes}`
+                    `/type/[...type]`,
+                    `/type/${trJobTypes}/${0}/${80000}`
                   )}
                   key={key}
                   mb='3'

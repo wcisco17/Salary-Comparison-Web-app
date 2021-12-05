@@ -1,6 +1,6 @@
 import { Job, PrismaClient, Website } from '@prisma/client';
 import express from 'express';
-import { getJob, getJobType, getJobTypes, search } from "./db/jobs";
+import { getAllJobs, getJob, getJobType, getJobTypes, search } from "./db/jobs";
 import { IJobs, ISearchTypeResult } from "./types/types";
 
 const prisma = new PrismaClient();
@@ -10,7 +10,12 @@ app.use(express.json());
 const PORT = 8080;
 
 const api = async () => {
-  app.get("/job_types", async (req, res) => {
+  app.get("/jobs", async (_, res) => {
+    const jobs = await getAllJobs({ db: prisma });
+    res.json(jobs);
+  })
+
+  app.get("/job_types", async (_, res) => {
     const jobTypes = await getJobTypes(prisma);
     res.json(jobTypes);
   })
@@ -52,7 +57,7 @@ const api = async () => {
     const items: IJobs[] = await getJobType({ db: prisma, type, min, max });
 
     if (items.length <= 0)
-      res.json({ error: "No Job type found" })
+      res.json([])
     res.json(items);
   })
 

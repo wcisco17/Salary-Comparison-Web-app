@@ -32,7 +32,7 @@ export const TableContent: React.FC<Props> = ({ data, companies }) => {
         </Tr>
       </Thead>
       <Tbody>
-        {data?.map((row) => {
+        {data!.map((row) => {
           return (
             <Tr key={row.job.id}>
               {columns.map((column, index) => {
@@ -41,10 +41,10 @@ export const TableContent: React.FC<Props> = ({ data, companies }) => {
                 const company = companies[row.job.websiteId - 1]
 
                 if (column.accessor == 'all')
-                  return <Td>{column.Cell?.(row.job)}</Td>
+                  return <Td key={index} >{column.Cell?.(row.job)}</Td>
 
                 if (column.accessor == 'websiteId')
-                  return <Td>{column.CellSource?.([company])}</Td>
+                  return <Td key={index}> {column.CellSource?.([company])}</Td>
 
                 return (
                   <Td whiteSpace="nowrap" key={index}>

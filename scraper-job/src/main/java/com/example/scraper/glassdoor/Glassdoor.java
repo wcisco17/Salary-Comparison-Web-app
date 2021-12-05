@@ -18,7 +18,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 public class Glassdoor implements Scraper<Job> {
     public SiteType title = SiteType.GLASSDOOR;
-    private static String websiteUrl = "https://www.indeed.com";
+    private static String websiteUrl = "https://www.glassdoor.com";
 
     @Override
     public Collection<Job> getJobsData(int jobLimit, String search) throws IOException {

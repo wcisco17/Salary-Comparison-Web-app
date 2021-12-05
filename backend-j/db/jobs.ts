@@ -6,7 +6,8 @@ export async function getJobTypes(db: PrismaClient): Promise<IShowResultJobTypes
   try {
     const jobTypes = await db.job.findMany({
       select: {
-        job_type: true
+        job_type: true,
+        salary: true,
       },
       orderBy: {
         job_type: 'asc'
@@ -14,6 +15,7 @@ export async function getJobTypes(db: PrismaClient): Promise<IShowResultJobTypes
     });
 
     const jobs = extractDuplicate(jobTypes);
+    const filteredJobs = convertMinMax((jobTypes) as Job[]);
 
     return jobs;
   } catch (err) {
@@ -47,6 +49,17 @@ export async function getJob({ db, id }: IGetJobResult): Promise<Job> {
     return job;
   } catch (error) {
     throw new Error("Error while running query " + error)
+  }
+}
+
+export async function getAllJobs({ db }: { db: PrismaClient }): Promise<IJobs[]> {
+  try {
+    const allJobs = await db.job.findMany({});
+    const filteredJobs = convertMinMax((allJobs as Job[]));
+    
+    return filteredJobs;
+  } catch (error) {
+    throw new Error(`Error while running query ` + error)
   }
 }
 
