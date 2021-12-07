@@ -2,10 +2,11 @@ import { Job, PrismaClient, Website } from '@prisma/client';
 import express from 'express';
 import { getAllJobs, getJob, getJobType, getJobTypes, search } from "./db/jobs";
 import { IJobs, ISearchTypeResult } from "./types/types";
+import cors from "cors";
 
 const prisma = new PrismaClient();
 const app = express();
-
+app.use(cors())
 app.use(express.json());
 const PORT = 8080;
 
@@ -43,7 +44,7 @@ const api = async () => {
     res.json(items);
   })
 
-  app.get("/job_type/:type", async (req, res) => {
+  app.get("/job_type/:type", async (req, res, next) => {
     const type = req.params.type;
 
     let min = Number(req.query.min);
@@ -58,6 +59,7 @@ const api = async () => {
 
     if (items.length <= 0)
       res.json([])
+
     res.json(items);
   })
 

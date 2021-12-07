@@ -1,0 +1,17 @@
+.css-s3502a {
+  cursor: pointer;
+  border-radius: 10px;
+  font-size: 15px;
+  padding-inline-start: 3px;
+  padding-inline-end: 3px;
+  padding-top: 12px;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-bottom: 12px;
+  display: flex;
+  align-items: center;
+  /* min-height: 60 px; */
+  background: #4299e1;
+  color: white;
+  margin-top: 12px;
+}

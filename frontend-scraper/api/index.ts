@@ -9,7 +9,7 @@ export type ICompaniesResult = Pick<Website, 'id' | 'title'>;
 
 const BACKEND_API = `http://localhost:8080`;
 
-export const getJobTypes = async (): Promise<IShowResultJobTypes> => {
+export const getJobType = async (): Promise<IShowResultJobTypes> => {
   const api = await fetch(`${BACKEND_API}/job_types`, {
     method: "GET",
   });
@@ -18,9 +18,9 @@ export const getJobTypes = async (): Promise<IShowResultJobTypes> => {
   return data;
 }
 
-export const getJobType = async ({ job_type, max, min }: IGetJobParams): Promise<IJobs[]> => {
+export const getJobTypes = async ({ job_type, max, min }: IGetJobParams): Promise<IJobs[] | undefined> => {
   const api = await fetch(`${BACKEND_API}/job_type/${job_type}?min=${min}&max=${max}`, {
-    method: "GET"
+    method: "GET",
   });
 
   const data: IJobs[] = await api.json();
@@ -43,4 +43,17 @@ export const getAllJobs = async (): Promise<IJobs[]> => {
 
   const data: IJobs[] = await api.json();
   return data;
+}
+
+type ISearchLengthInput = {
+  value: string | undefined
+}
+
+export const getSearchLength = async ({ value }: ISearchLengthInput): Promise<number> => {
+  const api = await fetch(`${BACKEND_API}/search/${value}/title/all/1000`, {
+    method: "GET"
+  })
+
+  const data: IJobs[] = await api.json();
+  return data.length
 }

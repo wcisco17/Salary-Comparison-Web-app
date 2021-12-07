@@ -16,7 +16,9 @@ export const columns = [
     Header: 'Salary',
     accessor: 'salary',
     Cell: function MemberCell(data: any) {
-      return <div>{data}</div>
+      return <Badge fontSize="xs" bg="#48BB78" color="white" >
+        {data}
+      </Badge>
     },
   },
 

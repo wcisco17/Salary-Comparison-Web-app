@@ -3,14 +3,15 @@ import { Box, Button, Flex, Input, Text } from "@chakra-ui/react";
 import { GetServerSidePropsContext, GetStaticPropsResult, InferGetServerSidePropsType } from 'next';
 import { useRouter } from "next/dist/client/router";
 import Image from 'next/image';
+import React from "react";
 import { IShowResultJobTypes } from "types/api";
-import { getJobTypes } from "../api";
+import { getJobType, getSearchLength } from "../api";
 import logo from "../public/ldark.png";
 
 export const getServerSideProps = async (_: GetServerSidePropsContext): Promise<GetStaticPropsResult<{
   data: IShowResultJobTypes
 }>> => {
-  const data: IShowResultJobTypes = await getJobTypes();
+  const data: IShowResultJobTypes = await getJobType();
 
   // return an empty array if there is no data
   if (!data) {
@@ -26,6 +27,28 @@ export const getServerSideProps = async (_: GetServerSidePropsContext): Promise<
 
 export default function Index({ data }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
+  const [search, setSearch] = React.useState<string | undefined>();
+  const [api, setApi] = React.useState<{
+    dataLength: number | null;
+  }>({
+    dataLength: null,
+  })
+
+  const fetchLengthValue = async () => {
+    setApi({ dataLength: null })
+    try {
+      const jobsLength = await getSearchLength({ value: search });
+      if (jobsLength > 0) setApi({ dataLength: jobsLength, })
+    } catch (error) { setApi({ dataLength: null }) }
+  }
+
+  React.useEffect(() => {
+    fetchLengthValue()
+  }, [search])
+
+  const onChange = (e: any) => {
+    setSearch(e.target.value)
+  }
 
   return (
     <Flex display="flex" flexDirection="column" alignItems="center" mx="5" borderRadius="10" justifyContent="center" backgroundColor='white'>
@@ -39,8 +62,8 @@ export default function Index({ data }: InferGetServerSidePropsType<typeof getSe
               return (
                 <Button
                   onClick={() => router.push(
-                    `/type/[...type]`,
-                    `/type/${trJobTypes}/${0}/${80000}`
+                    `/type/[type]`,
+                    `/type/${trJobTypes}`
                   )}
                   key={key}
                   mb='3'
@@ -59,10 +82,22 @@ export default function Index({ data }: InferGetServerSidePropsType<typeof getSe
 
       <Flex justifyContent="center" alignItems="center" mt="10">
         <Box mr="5" >
-          <Input placeholder='Search for Job Title' size='lg' />
-        </Box>
-        <Box>
-          <Button bg="brand.main" color="white" >Search</Button>
+          <Input value={search} onChange={onChange} placeholder='Search for Job Title' size='lg' />
+
+          {
+            search && search.length > 0 && (
+              <li id="search-item-0" className="css-s3502a">
+
+                <div className="css-1rr4qq7"><span className="css-oufhr">
+                  {
+                    !(api.dataLength) ? <span>No jobs found...</span> : <span>Found {api.dataLength} jobs with the keywords: {search}</span>
+                  }
+                </span>
+                </div>
+              </li>
+            )
+          }
+
         </Box>
       </Flex>
     </Flex>

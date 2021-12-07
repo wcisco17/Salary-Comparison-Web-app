@@ -15,7 +15,7 @@ export type ISearchTypeResult = {
 export type IGetJobTypeResult = {
   db: PrismaClient;
   type: string;
-}
+} & Pick<IJobs, 'min'> & Pick<IJobs, 'max'>
 
 export type IGetJobResult = {
   db: PrismaClient;

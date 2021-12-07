@@ -14,7 +14,7 @@ import { IJobs } from "types/api"
 import { columns } from './data'
 
 type Props = {
-  data: IJobs[]
+  data: IJobs[] | undefined
   companies: ICompaniesResult[]
 }
 
