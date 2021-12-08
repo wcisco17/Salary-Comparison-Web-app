@@ -1,11 +1,14 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { ArrowRightIcon } from "@chakra-ui/icons";
 import { Box, Button, Flex, Input, Text } from "@chakra-ui/react";
+import { JobsResult } from "components/JobsResult";
+import { removeDuplicatNums, sortValues } from "helpers";
 import { GetServerSidePropsContext, GetStaticPropsResult, InferGetServerSidePropsType } from 'next';
 import { useRouter } from "next/dist/client/router";
 import Image from 'next/image';
-import React from "react";
-import { IShowResultJobTypes } from "types/api";
-import { getJobType, getSearchLength } from "../api";
+import React, { useEffect } from "react";
+import { IJobs, IShowResultJobTypes } from "types/api";
+import { getCompanies, getJobType, getSearch, ICompaniesResult } from "../api";
 import logo from "../public/ldark.png";
 
 export const getServerSideProps = async (_: GetServerSidePropsContext): Promise<GetStaticPropsResult<{
@@ -27,27 +30,80 @@ export const getServerSideProps = async (_: GetServerSidePropsContext): Promise<
 
 export default function Index({ data }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
+  const [maxValue, setMaxValue] = React.useState(0)
+  const [minValue, setMinValue] = React.useState(0)
   const [search, setSearch] = React.useState<string | undefined>();
-  const [api, setApi] = React.useState<{
-    dataLength: number | null;
+
+  const [n, setN] = React.useState<any>()
+  const [jobs, setApiIJobs] = React.useState<{
+    data: IJobs[] | undefined
   }>({
-    dataLength: null,
+    data: undefined
+  })
+  const [companies, setApiICompanies] = React.useState<{
+    data: ICompaniesResult[] | null
+  }>({
+    data: null
   })
 
-  const fetchLengthValue = async () => {
-    setApi({ dataLength: null })
+  const fetchCompanies = async () => {
+    setApiICompanies({ data: null })
     try {
-      const jobsLength = await getSearchLength({ value: search });
-      if (jobsLength > 0) setApi({ dataLength: jobsLength, })
-    } catch (error) { setApi({ dataLength: null }) }
+      const comp = await getCompanies();
+      if (comp && comp.length > 0) {
+        setApiICompanies({ data: comp })
+      }
+    } catch (error) {
+      setApiICompanies({ data: null })
+    }
+  }
+
+  const fetchLengthValue = async () => {
+    setApiIJobs({ data: undefined })
+    try {
+      const jobsLength = await getSearch({ value: search, max: maxValue, min: minValue });
+      if (jobsLength && jobsLength.length > 0) {
+        setApiIJobs({ data: jobsLength })
+      }
+
+    } catch (error) { setApiIJobs({ data: undefined }) }
   }
 
   React.useEffect(() => {
-    fetchLengthValue()
+    fetchCompanies()
   }, [search])
+
+  React.useEffect(() => {
+    fetchLengthValue()
+  }, [search, maxValue, minValue])
 
   const onChange = (e: any) => {
     setSearch(e.target.value)
+  }
+
+  const nums = async () => {
+    try {
+      const jobs = await getSearch({ value: search, max: maxValue, min: minValue });
+      if (jobs!.length > 0) {
+        setN(jobs)
+      }
+    } catch (error) {
+    }
+  }
+
+  useEffect(() => {
+    nums()
+  }, [search])
+
+  const min = sortValues(removeDuplicatNums(n, "min"))
+  const max = sortValues(removeDuplicatNums(n, "max"))
+
+  const handleChangeMin = (event: any) => {
+    setMinValue(Number(event.target.value))
+  }
+
+  const handleChangeMax = (event: any) => {
+    setMaxValue(Number(event.target.value))
   }
 
   return (
@@ -80,26 +136,22 @@ export default function Index({ data }: InferGetServerSidePropsType<typeof getSe
         <Image className='container-logo--img' src={logo} layout="fixed" alt="..." />
       </Box>
 
-      <Flex justifyContent="center" alignItems="center" mt="10">
-        <Box mr="5" >
-          <Input value={search} onChange={onChange} placeholder='Search for Job Title' size='lg' />
+      <Input mt="4" value={search} onChange={onChange} placeholder='Search for Job Title' />
 
-          {
-            search && search.length > 0 && (
-              <li id="search-item-0" className="css-s3502a">
+      <div style={{ marginTop: 12, marginBottom: 12 }} />
 
-                <div className="css-1rr4qq7"><span className="css-oufhr">
-                  {
-                    !(api.dataLength) ? <span>No jobs found...</span> : <span>Found {api.dataLength} jobs with the keywords: {search}</span>
-                  }
-                </span>
-                </div>
-              </li>
-            )
-          }
-
-        </Box>
-      </Flex>
+      <JobsResult
+        jobs={jobs}
+        companies={companies}
+        search={search}
+        minValue={minValue}
+        min={min}
+        max={max}
+        maxValue={maxValue}
+        handleChangeMax={handleChangeMax}
+        handleChangeMin={handleChangeMin}
+      />
     </Flex>
   )
 }
+

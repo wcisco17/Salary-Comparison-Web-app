@@ -1,6 +1,8 @@
-import { Box, Flex, Heading, Select, Text } from "@chakra-ui/react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { Box, Heading, Text } from "@chakra-ui/react";
 import { getCompanies, getJobType, getJobTypes, ICompaniesResult } from "api";
 import { Jobs } from "components/Jobs";
+import { SalaryValue } from "components/SalaryValue";
 import { removeDuplicatNums, sortValues } from "helpers";
 import { GetStaticPropsContext, GetStaticPropsResult, InferGetStaticPropsType } from "next";
 import React, { useEffect, useState } from "react";
@@ -9,6 +11,12 @@ import { IJobs, IShowResultJobTypes } from "types/api";
 type IJobTypeResult = {
   job_type: string | undefined
   companies: ICompaniesResult[]
+};
+
+export type IAPIState = {
+  data: IJobs[] | undefined;
+  loading: boolean;
+  error: string | null;
 };
 
 export async function getStaticPaths() {
@@ -40,12 +48,6 @@ export async function getStaticProps({
   }
 }
 
-export type IAPIState = {
-  data: IJobs[] | undefined;
-  loading: boolean;
-  error: string | null;
-};
-
 function JobType({ companies, job_type }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [maxValue, setMaxValue] = React.useState(0)
   const [minValue, setMinValue] = React.useState(0)
@@ -76,9 +78,7 @@ function JobType({ companies, job_type }: InferGetStaticPropsType<typeof getStat
     }
   }
 
-  useEffect(() => {
-    fetchJobsData()
-  }, [maxValue, minValue])
+  useEffect(() => { fetchJobsData() }, [maxValue, minValue])
 
   const nums = async () => {
     try {
@@ -90,9 +90,7 @@ function JobType({ companies, job_type }: InferGetStaticPropsType<typeof getStat
     }
   }
 
-  useEffect(() => {
-    nums()
-  }, [])
+  useEffect(() => { nums() }, [])
 
   const min = sortValues(removeDuplicatNums(n, "min"))
   const max = sortValues(removeDuplicatNums(n, "max"))
@@ -104,6 +102,7 @@ function JobType({ companies, job_type }: InferGetStaticPropsType<typeof getStat
   const handleChangeMax = (event: any) => {
     setMaxValue(Number(event.target.value))
   }
+
   return (
     <Box as="section" py="12">
       <Text></Text>
@@ -116,21 +115,14 @@ function JobType({ companies, job_type }: InferGetStaticPropsType<typeof getStat
           <Box fontSize="md" mb="3" color="gray.500" >
             Compare Job prices
           </Box>
-          <Flex>
-            <Select value={Number(minValue)} onChange={(handleChangeMin)} placeholder='Min Salary'>
-              {
-                min?.map(value => value !== null && <option key={value} value={value}>${value}</option>)
-              }
-            </Select>
-
-            <div style={{ paddingRight: '20px' }} />
-
-            <Select value={Number(maxValue)} onChange={(handleChangeMax)} placeholder='Max Salary'>
-              {
-                max?.map(value => value !== null && <option key={value} value={value}>${value}</option>)
-              }
-            </Select>
-          </Flex>
+          <SalaryValue
+            minValue={minValue}
+            min={min}
+            max={max}
+            maxValue={maxValue}
+            handleChangeMax={handleChangeMax}
+            handleChangeMin={handleChangeMin}
+          />
           <Jobs
             api={api}
             companies={companies}

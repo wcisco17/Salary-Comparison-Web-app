@@ -47,13 +47,15 @@ export const getAllJobs = async (): Promise<IJobs[]> => {
 
 type ISearchLengthInput = {
   value: string | undefined
+  max?: number | undefined
+  min?: number | undefined
 }
 
-export const getSearchLength = async ({ value }: ISearchLengthInput): Promise<number> => {
-  const api = await fetch(`${BACKEND_API}/search/${value}/title/all/1000`, {
+export const getSearch = async ({ value , max, min}: ISearchLengthInput): Promise<IJobs[]> => {
+  const api = await fetch(`${BACKEND_API}/search/${value}/title/all/1000?min=${min}&max=${max}`, {
     method: "GET"
   })
 
   const data: IJobs[] = await api.json();
-  return data.length
+  return data
 }
