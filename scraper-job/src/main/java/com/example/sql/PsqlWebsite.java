@@ -23,6 +23,10 @@ public class PsqlWebsite implements DAO<Company, String> {
         this.connection = PSQLConnection.getConnection();
     }
 
+
+    /**
+     * @return Collection<Company>
+     */
     @Override
     public Collection<Company> getAll() {
         Collection<Company> companies = new ArrayList<>();
@@ -48,6 +52,11 @@ public class PsqlWebsite implements DAO<Company, String> {
         return companies;
     }
 
+
+    /**
+     * @param id
+     * @return Optional<Company>
+     */
     @Override
     public Optional<Company> get(Integer id) {
         return connection.flatMap(conn -> {
@@ -72,6 +81,13 @@ public class PsqlWebsite implements DAO<Company, String> {
         });
     }
 
+
+    /**
+     * @param company
+     * @param s
+     * @param id
+     * @return Optional<String>
+     */
     @Override
     public Optional<String> save(Company company, Optional<Integer> s, Optional<Integer> id) {
         String errorMessage = "The company to be added must not be null";
@@ -108,6 +124,10 @@ public class PsqlWebsite implements DAO<Company, String> {
 
     }
 
+
+    /**
+     * @param company
+     */
     @Override
     public void update(Company company) {
         String errorMessage = "The company to be updated must not be null";

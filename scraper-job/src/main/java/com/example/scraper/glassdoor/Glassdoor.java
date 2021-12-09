@@ -1,5 +1,8 @@
-// username: ramili7526@terasd.com
-// password: "7H^e%7bFbfY!wWJ!"
+/**
+ * @class Glassdoor - Getting all the jobs from Glassdoor
+ * @author  Williams Sissoko
+ */
+
 package com.example.scraper.glassdoor;
 
 import java.io.IOException;
@@ -18,8 +21,15 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 public class Glassdoor implements Scraper<Job> {
     public SiteType title = SiteType.GLASSDOOR;
-    private static String websiteUrl = "https://www.glassdoor.com";
+    public String websiteUrl = "https://www.glassdoor.com";
 
+    /**
+     * @see com.example.shell.Scraper for interface
+     * @param jobLimit
+     * @param search
+     * @return Collection<Job>
+     * @throws IOException
+     */
     @Override
     public Collection<Job> getJobsData(int jobLimit, String search) throws IOException {
         String fakeUsername = "ramili7526@terasd.com";
@@ -48,6 +58,13 @@ public class Glassdoor implements Scraper<Job> {
         return companies;
     }
 
+    /**
+     * @param jobLimit
+     * @param input
+     * @param jobType
+     * @return Collection<Job>
+     * @throws IOException
+     */
     @Override
     public Collection<Job> mapJobsData(int jobLimit, String input, String jobType) throws IOException {
         Collection<Job> glassDoor = new ArrayList<Job>();
@@ -86,6 +103,9 @@ public class Glassdoor implements Scraper<Job> {
         return glassDoor;
     }
 
+    /**
+     * @throws IOException
+     */
     @Override
     public void init() throws IOException {
     }

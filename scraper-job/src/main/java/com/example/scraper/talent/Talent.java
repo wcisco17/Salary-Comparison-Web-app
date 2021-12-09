@@ -1,3 +1,8 @@
+/**
+ * @class Talent - Getting all the jobs from Talent
+ * @author  Williams Sissoko
+ */
+
 package com.example.scraper.talent;
 
 import java.io.IOException;
@@ -16,8 +21,15 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 public class Talent implements Scraper<Job> {
     public SiteType title = SiteType.TALENT;
-    private static String websiteUrl = "https://www.talent.com";
+    public String websiteUrl = "https://www.talent.com";
 
+    /**
+     * @see com.example.shell.Scraper for interface
+     * @param jobLimit
+     * @param search
+     * @return Collection<Job>
+     * @throws IOException
+     */
     public Collection<Job> getJobsData(int jobLimit, String search) throws IOException {
         System.setProperty("webdriver.chrome.driver",
                 "/Users/williamssissoko/Desktop/MDX/ADVANCED-WEB-CLASS/coursework1/salary-comp/scraper-job/src/main/java/com/example/scraper/chromedriver");
@@ -37,6 +49,13 @@ public class Talent implements Scraper<Job> {
         return companies;
     }
 
+    /**
+     * @param jobLimit
+     * @param input
+     * @param type
+     * @return Collection<Job>
+     * @throws IOException
+     */
     public Collection<Job> mapJobsData(int jobLimit, String input, String type) throws IOException {
         Collection<Job> jobList = new ArrayList<Job>();
         Document doc = Jsoup.parse(input);

@@ -11,6 +11,10 @@ public class PSQLConnection {
     private static final Logger LOGGER = Logger.getLogger(PSQLConnection.class.getName());
     private static Optional<Connection> connection = Optional.empty();
 
+
+    /**
+     * @return Optional<Connection>
+     */
     public static Optional<Connection> getConnection() {
         if (connection.isEmpty()) {
             String url = "jdbc:postgresql://localhost:5432/salarycomp";

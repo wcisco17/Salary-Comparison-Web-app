@@ -1,3 +1,8 @@
+/**
+ * @class ExcecuteDB - Executing our code and connecting to the main database
+ * @author  Williams Sissoko
+ */
+
 package com.example.scraper;
 
 import java.io.IOException;
@@ -27,30 +32,69 @@ public class ExcecuteDB {
     private static final DAO<Job, String> JOB_DAO = new PsqlJobs();
     private static boolean done = false;
 
+    /**
+     * @param company
+     * @param c
+     * @param i
+     * @return Optional<String>
+     */
     public static Optional<String> addCompany(Company company, Optional<Integer> c, Optional<Integer> i) {
         return COMPANY_DAO.save(company, c, i);
     }
 
+    /**
+     * @param company
+     */
     public static void updateCompany(Company company) {
         COMPANY_DAO.update(company);
     }
 
+    /**
+     * @return Collection<Company>
+     */
     public static Collection<Company> getAllCompanies() {
         return COMPANY_DAO.getAll();
     }
 
+    /**
+     * @param id
+     * @return Optional<Company>
+     */
     public static Optional<Company> getCompany(Integer id) {
         return COMPANY_DAO.get(id);
     }
 
+    /**
+     * @param job
+     * @param websiteId
+     * @param id
+     * @return Optional<String>
+     */
     public static Optional<String> addJob(Job job, Optional<Integer> websiteId, Optional<Integer> id) {
         return JOB_DAO.save(job, websiteId, id);
     }
 
+    /**
+     * @param job
+     * @return Optional<String>
+     */
     public static Optional<String> getJobs(Job job) {
         return null;
     }
 
+    /**
+     * @return Collection<Job>
+     */
+    public static Collection<Job> getAllJobs() {
+        return JOB_DAO.getAll();
+    }
+
+    /**
+     * @param searchQuery
+     * @param searchQueryLimit
+     * @param talent
+     * @param comp
+     */
     private static void runGetJobsData(String searchQuery, int searchQueryLimit, Scraper<Job> talent, Company comp) {
         try {
             jobs = talent.getJobsData((searchQueryLimit), searchQuery);
@@ -64,6 +108,9 @@ public class ExcecuteDB {
         }
     }
 
+    /**
+     * @throws IOException
+     */
     public static void main() throws IOException {
         // prompts variables
         Scanner in = new Scanner(System.in);

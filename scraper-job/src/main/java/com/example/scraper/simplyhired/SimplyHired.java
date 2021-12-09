@@ -1,3 +1,8 @@
+/**
+ * @class SimplyHired - Getting all the jobs from SimplyHired
+ * @author  Williams Sissoko
+ */
+
 package com.example.scraper.simplyhired;
 
 import java.io.IOException;
@@ -16,8 +21,16 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 public class SimplyHired implements Scraper<Job> {
     public SiteType title = SiteType.SIMPLYHIRED;
-    private static String websiteUrl = "https://www.simplyhired.com";
+    public String websiteUrl = "https://www.simplyhired.com";
 
+
+    /**
+     * @see com.example.shell.Scraper for interface
+     * @param jobLimit
+     * @param search
+     * @return Collection<Job>
+     * @throws IOException
+     */
     @Override
     public Collection<Job> getJobsData(int jobLimit, String search) throws IOException {
         System.setProperty("webdriver.chrome.driver",
@@ -42,6 +55,14 @@ public class SimplyHired implements Scraper<Job> {
         return companies;
     }
 
+
+    /**
+     * @param jobLimit
+     * @param input
+     * @param jobType
+     * @return Collection<Job>
+     * @throws IOException
+     */
     @Override
     public Collection<Job> mapJobsData(int jobLimit, String input, String jobType) throws IOException {
         Collection<Job> simplyhiredJobs = new ArrayList<Job>();
@@ -63,6 +84,10 @@ public class SimplyHired implements Scraper<Job> {
         return simplyhiredJobs;
     }
 
+
+    /**
+     * @throws IOException
+     */
     @Override
     public void init() throws IOException {
     }

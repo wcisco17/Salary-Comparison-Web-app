@@ -15,26 +15,51 @@ public class Company {
         this.type = type;
     }
 
+
+    /**
+     * @return Integer
+     */
     public Integer getId() {
         return this.id;
     }
 
+
+    /**
+     * @return SiteType
+     */
     public SiteType getSiteType() {
         return this.type;
     }
 
+
+    /**
+     * @return String
+     */
     public String getLogo() {
         return this.logo;
     }
 
+
+    /**
+     * @return String
+     */
     public String getTitle() {
         return this.title;
     }
 
+
+    /**
+     * @return String
+     */
     public String getUrl() {
         return this.url;
     }
 
+
+    /**
+     * @param t
+     * @return Object
+     */
     public Object siteId(String t) {
         return t;
     }

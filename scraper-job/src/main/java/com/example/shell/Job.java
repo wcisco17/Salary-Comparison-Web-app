@@ -16,34 +16,66 @@ public class Job {
         this.jobType = jobType;
     }
 
+
+    /**
+     * @return String
+     */
     public String getCompanyName() {
         return this.companyName;
     }
 
+
+    /**
+     * @return String
+     */
     public String getJobTitle() {
         return this.jobTitle;
     }
 
+
+    /**
+     * @return String
+     */
     public String getJobType() {
         return this.jobType;
     }
 
+
+    /**
+     * @return String
+     */
     public String getUrl() {
         return this.url;
     }
 
+
+    /**
+     * @return String
+     */
     public String getLocation() {
         return this.location;
     }
 
+
+    /**
+     * @return String
+     */
     public String getShortDescription() {
         return this.shortDescription;
     }
 
+
+    /**
+     * @return String
+     */
     public String getSalary() {
         return this.salary;
     }
 
+
+    /**
+     * @return String
+     */
     public String getLogo() {
         return this.logo;
     }

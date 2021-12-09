@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,16 +24,55 @@ public class PsqlJobs implements DAO<Job, String> {
         this.connection = PSQLConnection.getConnection();
     }
 
+
+    /**
+     * @return Collection<Job>
+     */
     @Override
     public Collection<Job> getAll() {
-        return null;
+        Collection<Job> jobs = new ArrayList<>();
+        String sql = "SELECT * FROM \"Job\"";
+
+        connection.ifPresent(conn -> {
+            try (Statement statement = conn.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
+                while (resultSet.next()) {
+                    String title = resultSet.getString("title");
+                    String salary = resultSet.getString("salary");
+                    String company_name = resultSet.getString("company_name");
+                    String url = resultSet.getString("url");
+                    String location = resultSet.getString("location");
+                    String shortDescription = resultSet.getString("short_description");
+                    String logo = resultSet.getString("logo");
+                    String jobType = resultSet.getString("job_type");
+
+                    Job job = new Job(company_name, title, salary, logo, url, location, shortDescription, jobType);
+
+                    jobs.add(job);
+                }
+            } catch (SQLException ex) {
+                LOGGER.log(Level.SEVERE, null, ex);
+            }
+        });
+        return jobs;
     }
 
+
+    /**
+     * @param id
+     * @return Optional<Job>
+     */
     @Override
     public Optional<Job> get(Integer id) {
         return null;
     }
 
+
+    /**
+     * @param job
+     * @param websiteId
+     * @param id
+     * @return Optional<String>
+     */
     @Override
     public Optional<String> save(Job job, Optional<Integer> websiteId, Optional<Integer> id) {
         String errorMessage = "The company to be added must not be null";
@@ -82,6 +122,10 @@ public class PsqlJobs implements DAO<Job, String> {
         });
     }
 
+
+    /**
+     * @param company
+     */
     @Override
     public void update(Job company) {
     }

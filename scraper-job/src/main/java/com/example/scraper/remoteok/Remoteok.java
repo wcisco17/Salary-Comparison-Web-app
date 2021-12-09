@@ -1,3 +1,8 @@
+/**
+ * @class Remoteok - Getting all the jobs from Remoteok
+ * @author  Williams Sissoko
+ */
+
 package com.example.scraper.remoteok;
 
 import java.io.IOException;
@@ -16,8 +21,16 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 public class Remoteok implements Scraper<Job> {
     public SiteType title = SiteType.REMOTEOK;
-    private static String websiteUrl = "https://remoteok.io";
+    public String websiteUrl = "https://remoteok.io";
 
+
+    /**
+     * @see com.example.shell.Scraper for interface
+     * @param jobLimit
+     * @param search
+     * @return Collection<Job>
+     * @throws IOException
+     */
     @Override
     public Collection<Job> getJobsData(int jobLimit, String search) throws IOException {
         System.setProperty("webdriver.chrome.driver",
@@ -36,6 +49,14 @@ public class Remoteok implements Scraper<Job> {
         return companies;
     }
 
+
+    /**
+     * @param jobLimit
+     * @param input
+     * @param type
+     * @return Collection<Job>
+     * @throws IOException
+     */
     @Override
     public Collection<Job> mapJobsData(int jobLimit, String input, String type)
             throws IOException {
@@ -60,6 +81,10 @@ public class Remoteok implements Scraper<Job> {
         return remoteOkJobs;
     }
 
+
+    /**
+     * @throws IOException
+     */
     public void init() throws IOException {
     }
 }
