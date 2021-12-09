@@ -1,10 +1,10 @@
-import { Job, PrismaClient, Website } from '@prisma/client';
-import express from 'express';
-import { getAllJobs, getJob, getJobType, getJobTypes, search } from "./db/jobs";
-import { IJobs, ISearchTypeResult } from "./types/types";
+import type { Job, Website } from "@prisma/client";
 import cors from "cors";
+import express from 'express';
+import prisma from "./client";
+import { getAllJobs, getJob, getJobType, getJobTypes, search } from "./db/jobs";
+import type { IJobs, ISearchTypeResult } from "./types/types";
 
-const prisma = new PrismaClient();
 const app = express();
 app.use(cors())
 app.use(express.json());
@@ -27,8 +27,8 @@ const api = async () => {
     const keywordType: Pick<ISearchTypeResult, 'keywordType'> = (req.params.keywordType as unknown as Pick<ISearchTypeResult, 'keywordType'>)
     const keyword: string = req.params.keyword
 
-    let min: unknown = Number(req.query.min);
-    let max: unknown = Number(req.query.max);
+    let min: unknown | any = Number(req.query.min);
+    let max: unknown | any = Number(req.query.max);
 
     if (!min)
       min = null
@@ -47,8 +47,8 @@ const api = async () => {
   app.get("/job_type/:type", async (req, res, next) => {
     const type = req.params.type;
 
-    let min = Number(req.query.min);
-    let max = Number(req.query.max);
+    let min: any = Number(req.query.min);
+    let max: any = Number(req.query.max);
 
     if (!min)
       min = null
@@ -65,7 +65,7 @@ const api = async () => {
 
   app.get("/job/:id", async (req, res) => {
     const id = Number(req.params.id);
-    const item: Job = await getJob({ db: prisma, id });
+    const item: Job | null = await getJob({ db: prisma, id });
 
     if (!item)
       res.json({ error: `No Job found with id: ${id}` })
