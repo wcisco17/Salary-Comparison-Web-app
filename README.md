@@ -1,5 +1,6 @@
 # Salary-Comparison
-Individual Project - Coursework (Career Path Analyzer)
+
+### Course: CST3130 Advanced Web Development with Big Data
 
 ## Introduction
 A brief summary of what has been written in the proposal
